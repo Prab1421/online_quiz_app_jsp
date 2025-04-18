@@ -73,7 +73,7 @@ request.setAttribute("notlogin_msg","Sorry,Please do Login first");
                     	<div class="calendar">2</div>
                         <div class="news_content">
 						<p><span></span>
-						we have latest projects uoloaded on my site</p>
+						we have latest projects uploaded on my site</p>
                         <a href="www.cstpoint.com" class="read_more">read more</a>                        
                         </div>
                     </div>                    

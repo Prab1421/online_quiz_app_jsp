@@ -1,93 +1,77 @@
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
-<%@page import="com.sun.org.apache.bcel.internal.generic.Select"%>
 
-<%! static int count1=0; %>
+<%!
+    // Removed static variables for count1 and total, to avoid issues across requests
+    int total = 0;
+    int count1 = 0;
+%>
 
-<%! static int total=0; %>
 <%
-if(session.getAttribute("count")!=null){
-String name=(String)session.getAttribute("quizname");
-String ans= (String)session.getAttribute("ans");
-Integer count=(Integer)session.getAttribute("count");
-try{
-if(count1==0)
-{
-count1=count-1;
+    if (session.getAttribute("count") != null) {
+        String name = (String) session.getAttribute("quizname");
+        String ans = (String) session.getAttribute("ans");
+        Integer count = (Integer) session.getAttribute("count");
 
-Class.forName("oracle.jdbc.driver.OracleDriver");
-Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL","KINSHUK","MANTU");
-PreparedStatement ps=con.prepareStatement("select answer from quizques where quizname='"+name+"' and qid='"+count1+"' ");
-ResultSet rs=ps.executeQuery();
-if(rs.next()){
-String ans1=rs.getString(1);
-System.out.println("ans1 on c10="+ans1);
-System.out.println("ans on get1="+ans);
-if(ans1.equals(ans)){
-total=total+1;
-System.out.println("total="+total);
-}
+        try {
+            // Set count1 based on current count value
+            if (count1 == 0) {
+                count1 = count - 1;
+            } else {
+                count1 = count - 2;
+            }
 
-}
+            // Database connection setup
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "KINSHUK", "MANTU");
 
-con.close();
-}
+            // Query to get the correct answer for the current question
+            PreparedStatement ps = con.prepareStatement("SELECT answer FROM quizques WHERE quizname = ? AND qid = ?");
+            ps.setString(1, name);
+            ps.setInt(2, count1);
 
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String ans1 = rs.getString(1);
 
+                // Compare the user's answer with the correct answer
+                if (ans1.equals(ans)) {
+                    total++;
+                }
+            }
 
-else{
-count1=count-2;
-System.out.print("count at get1:"+count);
+            // Check if the current count exceeds the max question count
+            if (count > (Integer) session.getAttribute("max")) {
+                Integer max = (Integer) session.getAttribute("max");
+                ps = con.prepareStatement("SELECT answer FROM quizques WHERE quizname = ? AND qid = ?");
+                ps.setString(1, name);
+                ps.setInt(2, max);
 
-Class.forName("oracle.jdbc.driver.OracleDriver");
-Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL","KINSHUK","MANTU");
-PreparedStatement ps=con.prepareStatement("select answer from quizques where quizname='"+name+"' and qid='"+count1+"' ");
-ResultSet rs=ps.executeQuery();
-if(rs.next()){
-String ans1=rs.getString(1);
-System.out.println("ans1="+ans1);
-System.out.println("ans on get1="+ans);
-if(ans1.equals(ans)){
-total=total+1;
-System.out.println("total="+total);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    String ans1 = rs.getString(1);
+                    String ans2 = (String) session.getAttribute("ans");
 
-}
+                    if (ans1.equals(ans2)) {
+                        total++;
+                    }
+                }
+            }
 
-}
-con.close();
-}
-if(count>(Integer)session.getAttribute("max"))
-{
-Integer max=(Integer)session.getAttribute("max");
-Class.forName("oracle.jdbc.driver.OracleDriver");
-Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL","KINSHUK","MANTU");
-PreparedStatement ps=con.prepareStatement("select answer from quizques where quizname='"+name+"' and qid='"+max+"' ");
-ResultSet rs=ps.executeQuery();
-if(rs.next()){
-String ans1=rs.getString(1);
-System.out.println("ans1 on c1="+ans1);
-String ans2=(String) session.getAttribute("ans");
-System.out.println("ans on get1="+ans2);
-if(ans1.equals(ans2)){
-total=total+1;
-System.out.println("total="+total);
-}
+            // Set the total score as a request attribute
+            request.setAttribute("total", total);
+            total = 0;  // Reset total for the next session
 
-}
+            con.close();
 
-con.close();
-request.setAttribute("total",total);
-total=0;
+            // Forward to result page
+            %>
+            <jsp:forward page="result.jsp"></jsp:forward>
+            <%
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 %>
 
-<jsp:forward page="result.jsp"></jsp:forward>
-<% 
-
- 
-}
-
-}catch(Exception e){e.printStackTrace();}
-
-}
-%>
 <jsp:forward page="get.jsp"></jsp:forward>

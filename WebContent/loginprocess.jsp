@@ -1,46 +1,51 @@
-<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
-<%@page import="org.omg.CORBA.PUBLIC_MEMBER"%>
-<%@page import="java.sql.*"%>
-<%@page import="java.util.*"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page import="java.sql.*" %>
+
 <%
-String username=request.getParameter("username");
-System.out.print(username);
-String userpass=request.getParameter("userpass");
-String category=request.getParameter("category");
+String username = request.getParameter("username");
+String userpass = request.getParameter("userpass");
+String category = request.getParameter("category");
 
-boolean status=false;
-try{
-Class.forName("oracle.jdbc.driver.OracleDriver");
-Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL","KINSHUK","MANTU");
-PreparedStatement ps=con.prepareStatement("select * from quizregister where username=? and userpass=? ");
-ps.setString(1,username);
-ps.setString(2,userpass);
-ResultSet rs=ps.executeQuery();
-status=rs.next();
-if(status){
-System.out.print("hi");
-username=rs.getString(1);
-session.setAttribute("username",String.valueOf(username));
-session.setAttribute("islogin","plz sign in first");
-session.setAttribute("category",category);
+boolean status = false;
+
+try {
+    // Load MySQL JDBC Driver
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    // Establish Connection (update db_name, username, and password as needed)
+    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/quiz_db", "quizuser", "1234");
+
+    // Prepare SQL statement
+    PreparedStatement ps = con.prepareStatement("SELECT * FROM QUIZREGISTER WHERE username = ? AND userpass = ?");
+    ps.setString(1, username);
+    ps.setString(2, userpass);
+
+    ResultSet rs = ps.executeQuery();
+    status = rs.next();
+
+    if (status) {
+        // Set session attributes
+        session.setAttribute("username", rs.getString("username")); 
+        session.setAttribute("islogin", "true");
+        session.setAttribute("category", category);
+
+        // Redirect to home page
+        response.sendRedirect("home.jsp");
+    } else {
+        // Set error message and forward back to login
+        request.setAttribute("Error", "Sorry! Username or Password is incorrect. Please try again or register.");
+        session.setAttribute("Loginmsg", "Please sign in first.");
+        RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+        rd.forward(request, response);
+    }
+
+    // Close resources
+    rs.close();
+    ps.close();
+    con.close();
+
+} catch (Exception e) {
+    e.printStackTrace();
+    out.println("<p style='color:red;'>An error occurred while processing your request. Please try again later.</p>");
+}
 %>
-<jsp:forward page="home.jsp"></jsp:forward>
-<%
-}
-else{
-System.out.print("hi");
-request.setAttribute("Error","Sorry! Username or Password Error. plz Enter Correct Detail or Register");
-session.setAttribute("Loginmsg","plz sign in first");
-%>
-<jsp:forward page="index.jsp"></jsp:forward>
-<%
-}
-}
-
-catch(Exception e){
-e.printStackTrace();
-}
-
-%>
-
-
