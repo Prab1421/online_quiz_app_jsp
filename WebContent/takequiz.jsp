@@ -76,10 +76,11 @@ if (islogin == null) {
         <div class="calendar_box_content">
             <h1>Welcome to my Site</h1>
             <marquee direction="left" style="color: navy;" onmouseover="stop()" onmouseout="start()"><B>Assess Yourself by taking quizzes on various subjects</B></marquee>
-            <form method="post" name="myform" action="get.jsp">
-                Enter the subject: <input type="text" name="subject" onkeyup="sendInfo()" />
-                <div id="location"></div>
-            </form>
+            <form method="post" name="myform" action="get1.jsp">
+			    Enter the subject: <input type="text" name="subject" onkeyup="sendInfo()" />
+			    <input type="submit" value="Enter Quiz">
+			    <div id="location"></div>
+			</form>
         </div>
     </div>
 </div>

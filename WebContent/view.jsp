@@ -1,11 +1,10 @@
-<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
-<%@ page import="java.sql.*" %>
+<%@ page language="java" import="java.util.*,java.sql.*" pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="ISO-8859-1">
     <title>Quiz Dashboard</title>
-    <link rel="stylesheet" href="yourstyles.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -118,13 +117,6 @@
     <div>
         <h1>Our Main Services</h1>
     </div>
-    <div class="services">
-        <ul>
-            <li><a href="https://www.javatpoint.com" target="_blank">Java Tutorial</a></li>
-            <li><a href="https://www.cstpoint.com" target="_blank">CSE Tutorial</a></li>
-        </ul>
-    </div>
-
     <div class="services">
         <ul>
             <li><a href="https://www.javatpoint.com" target="_blank">Java Tutorial</a></li>

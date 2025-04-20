@@ -9,7 +9,7 @@
 
 <%
     if (session.getAttribute("count") != null) {
-        String name = (String) session.getAttribute("quizname");
+        String name = (String) session.getAttribute("subject");
         String ans = (String) session.getAttribute("ans");
         Integer count = (Integer) session.getAttribute("count");
 
@@ -21,9 +21,9 @@
                 count1 = count - 2;
             }
 
-            // Database connection setup
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "KINSHUK", "MANTU");
+            // Database connection setup for MySQL
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/quiz_db", "quizuser", "1234");
 
             // Query to get the correct answer for the current question
             PreparedStatement ps = con.prepareStatement("SELECT answer FROM quizques WHERE quizname = ? AND qid = ?");

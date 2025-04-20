@@ -1,70 +1,10 @@
 <%@ page language="java" import="java.util.*, java.sql.*" pageEncoding="ISO-8859-1"%>
 <html>
 <head>
-<script>
-var request;
-function get1(){
-    window.location='get1.jsp';
-}
-
-function get(){
-    var v=document.querySelector('input[name="radio"]:checked') ? document.querySelector('input[name="radio"]:checked').value : null;
-    if (v) {
-        window.location="get.jsp?ans=" + v;
-    } else {
-        alert("Please select an option!");
-    }
-}
-
-function sendInfo() {
-    var v = document.myform.subject.value;
-    var url = "findname2.jsp?val=" + v;
-    if(window.XMLHttpRequest) {
-        request = new XMLHttpRequest();
-    } else if(window.ActiveXObject) {
-        request = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    try {
-        request.onreadystatechange = getInfo;
-        request.open("GET", url, true);
-        request.send();
-    } catch(e) {
-        alert("Unable to connect to server");
-    }
-}
-
-function getInfo() {
-    if(request.readyState == 4) {
-        var val = request.responseText;
-        document.getElementById('location').innerHTML = val;
-    }
-}
-
-function viewAll(name) {
-    var v = name;
-    var url = "findname3.jsp?val=" + v;
-    if(window.XMLHttpRequest) {
-        request = new XMLHttpRequest();
-    } else if(window.ActiveXObject) {
-        request = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    try {
-        request.onreadystatechange = viewInfo;
-        request.open("GET", url, true);
-        request.send();
-    } catch(e) {
-        alert("Unable to connect to server");
-    }
-}
-
-function viewInfo() {
-    if(request.readyState == 4) {
-        var val = request.responseText;
-        document.getElementById('location').innerHTML = val;
-    }
-}
-</script>
+    <title>Start Quiz</title>
 </head>
+
+<body>
 
 <jsp:include page="header.jsp"></jsp:include>
 
@@ -72,7 +12,6 @@ function viewInfo() {
     String islogin = (String) session.getAttribute("islogin");
     if(islogin == null) {
         request.setAttribute("notlogin_msg", "Sorry, please do Login first");
-        // Redirect to login page if not logged in
         request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 %>
@@ -84,22 +23,24 @@ function viewInfo() {
             out.print(request.getAttribute("notlogin_msg"));
             out.print("</font>");
         }
-    %>
-    <% 
+
         if(request.getAttribute("Error") != null) {
             out.print("<font size='2' color='red'>");
             out.print(request.getAttribute("Error"));
             out.print("</font>");
         }
-    %>
-    <% 
+
         if(request.getAttribute("finished") != null) {
-            out.print("<font size='2' color='navy'>");
-            out.print("<b>");
+            out.print("<font size='2' color='navy'><b>");
             out.print(request.getAttribute("finished"));
-            out.print("</b>");
-            out.print("</font>");
+            out.print("</b></font>");
         }
+
+        String question = (String) session.getAttribute("question");
+        String option1 = (String) session.getAttribute("option1");
+        String option2 = (String) session.getAttribute("option2");
+        String option3 = (String) session.getAttribute("option3");
+        String option4 = (String) session.getAttribute("option4");
     %>
 
     <div class="calendar_box2">
@@ -108,34 +49,22 @@ function viewInfo() {
             <marquee direction="left" style="color: navy;" onmouseover="stop()" onmouseout="start()">
                 <b>Assess Yourself by taking quizzes on various subjects</b>
             </marquee>
-            <form method="post" action="get1.jsp">
-                <table>
-                    <tr>
-                        <td>
-                            <%
-                                String question = (String) session.getAttribute("question");
-                                String option1 = (String) session.getAttribute("option1");
-                                String option2 = (String) session.getAttribute("option2");
-                                String option3 = (String) session.getAttribute("option3");
-                                String option4 = (String) session.getAttribute("option4");
-                                out.print(question);
-                            %>
-                            <%
-                                if(request.getParameter("radio") != null) {
-                                    String ans = request.getParameter("radio");
-                                    session.setAttribute("ans", ans);
-                                }
-                            %>
-                        </td>
-                    </tr>
-                    <tr><td><input type="radio" name="radio" value="<%=option1%>" /><%=option1%></td></tr>    
-                    <tr><td><input type="radio" name="radio" value="<%=option2%>"/><%=option2%></td></tr>    
-                    <tr><td><input type="radio" name="radio" value="<%=option3%>"/><%=option3%></td></tr>    
-                    <tr><td><input type="radio" name="radio" value="<%=option4%>"/><%=option4%></td></tr>            
 
-                    <tr><td></td><td><input type="submit" value="Next" /></td></tr>
+            <% if (question != null) { %>
+            <form method="post" action="get.jsp">
+                <table>
+                    <tr><td><b><%= question %></b></td></tr>
+                    <tr><td><input type="radio" name="ans" value="<%= option1 %>" required /> <%= option1 %></td></tr>
+                    <tr><td><input type="radio" name="ans" value="<%= option2 %>" /> <%= option2 %></td></tr>
+                    <tr><td><input type="radio" name="ans" value="<%= option3 %>" /> <%= option3 %></td></tr>
+                    <tr><td><input type="radio" name="ans" value="<%= option4 %>" /> <%= option4 %></td></tr>
+                    <tr><td><input type="submit" value="Next" /></td></tr>
                 </table>
             </form>
+            <% } else { %>
+                <p><b>Quiz finished or no questions to show.</b></p>
+            <% } %>
+
         </div>
     </div>
 
@@ -188,8 +117,5 @@ function viewInfo() {
 
 <div id="footer"></div>
 
-</div> <!--end of center box-->
-</div> <!--end of main content-->
-</div> <!--end of main container-->
 </body>
 </html>
